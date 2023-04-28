@@ -1,0 +1,52 @@
+import matplotlib.animation as animation
+from mpl_toolkits.mplot3d import axes3d
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import matplotlib as mpl
+import numpy as np
+import networkx as nx
+from matplotlib.animation import FuncAnimation, PillowWriter 
+
+#Criando uma função periodica
+def PS(x, y, t):
+    return np.exp(-(x-3)**2-(y)**2) + np.exp(-(x+3)**2-(y)**2)+ np.sqrt((2*b**2)/(np.pi*(1+8*b**2*A*t)))*(abs(c1)**2*np.exp(-(x-a)**2/(2*b**2)-(2*b**2*y**2)/(1+8*b**2*A*t)) + abs(c2)**2*np.exp(-(x+a)**2/(2*b**2)-(2*b**2*y**2)/(1+8*b**2*A*t)) + 2*np.exp(-(x**2)/(2*b**2)-(2*b**2*y**2+4*a**2*A*t)/(1+8*b**2*A*t))*(c3.real*np.cos((2*a*y)/(1+8*b**2*A*t)) + c3.imag*np.sin((2*a*y)/(1+8*b**2*A*t))) )
+
+#Dados para aplicar na função 
+x = np.linspace(-5, 5, 101)
+p = np.linspace(-5, 5, 101)
+t = np.linspace(0, 10e-25, 101)
+
+x1 = 1
+y1 = 1
+x2 = 1
+y2 = 1
+c1 = complex(x1,y1)
+c2 = complex(x2,y2)
+c3 = c1*np.conj(c2)
+a  = 10
+b  = 1
+A  = 10e20
+
+#Cria matrizes de coordenadas a partir das coords x e y
+X, P = np.meshgrid(x, p)
+fig = plt.figure('Interferência', figsize = (12, 6))     
+#ax = fig.gca(projection = '3d')
+
+ax = fig.add_subplot(projection='3d')
+
+#Esta função é chamada periodicamente a partir da FuncAnimation
+def update(i):
+    ax.view_init(30, -60 + i/3)
+    Z = PS(X, P, t*[i])
+    ax.clear()
+    ax.plot_surface(X, P, Z, cmap = mpl.cm.magma)
+    plt.title(str(i))
+    plt.xlabel('$P$', color = 'black')
+    plt.ylabel('$X$', color = 'black') 
+    
+#Plotagem para chamar a função update() periodicamente
+ani = animation.FuncAnimation(fig, update, np.arange(40), interval = 4, repeat = True)
+plt.grid()
+plt.show()
+ani.save(r"C:\Users\User\OneDrive\Documents\MasterThesis/animation.gif", writer='imagemagick', fps=60)
+
